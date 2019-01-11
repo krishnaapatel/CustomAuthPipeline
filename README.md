@@ -12,6 +12,16 @@ JWT implementation need some dependencies([refer](https://mvnrepository.com/arti
 
 ## Usage
 
+You need to specify your custom class in portal.properties file like,
+
+```java
+
+auth.verifier.pipeline=com.alitaste.portal.security.auth.FacebookAuthHeaderAutoLogin
+auth.verifier.FacebookAuthHeaderAutoLogin.hosts.allowed=
+auth.verifier.FacebookAuthHeaderAutoLogin.urls.includes=/api/jsonws/*
+
+```
+
 you can create and decode JWT token using its library. like,
 
 ```java
