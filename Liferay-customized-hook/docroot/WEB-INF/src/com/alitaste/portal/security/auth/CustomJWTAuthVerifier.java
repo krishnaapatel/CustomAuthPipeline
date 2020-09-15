@@ -1,56 +1,49 @@
 package com.alitaste.portal.security.auth;
 
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.Company;
+import com.liferay.portal.kernel.model.CompanyConstants;
+import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.security.auth.AccessControlContext;
+import com.liferay.portal.kernel.security.auth.AuthException;
+import com.liferay.portal.kernel.security.auth.Authenticator;
+import com.liferay.portal.kernel.security.auth.verifier.AuthVerifier;
+import com.liferay.portal.kernel.security.auth.verifier.AuthVerifierResult;
+import com.liferay.portal.kernel.security.auto.login.AutoLogin;
+import com.liferay.portal.kernel.security.auto.login.AutoLoginException;
+import com.liferay.portal.kernel.service.UserLocalServiceUtil;
+import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.Validator;
+
 import java.util.Properties;
 import java.util.StringTokenizer;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.liferay.portal.kernel.json.JSONFactoryUtil;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.servlet.HttpHeaders;
-import com.liferay.portal.kernel.util.Base64;
-import com.liferay.portal.kernel.util.CharPool;
-import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.Http;
-import com.liferay.portal.kernel.util.HttpUtil;
-import com.liferay.portal.kernel.util.MapUtil;
-import com.liferay.portal.kernel.util.PropsUtil;
-import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.model.Company;
-import com.liferay.portal.model.CompanyConstants;
-import com.liferay.portal.model.User;
-import com.liferay.portal.security.auth.AccessControlContext;
-import com.liferay.portal.security.auth.AuthException;
-import com.liferay.portal.security.auth.AuthVerifier;
-import com.liferay.portal.security.auth.AuthVerifierResult;
-import com.liferay.portal.security.auth.Authenticator;
-import com.liferay.portal.security.auth.AutoLoginException;
-import com.liferay.portal.security.auth.BaseAutoLogin;
-import com.liferay.portal.util.Portal;
-import com.liferay.portal.util.PortalUtil;
-import com.liferay.portal.model.User;
-import com.liferay.portal.service.UserLocalServiceUtil;
-import com.liferay.portal.kernel.json.JSONObject;
-import com.liferay.portal.kernel.facebook.FacebookConnectUtil;
-import com.liferay.portal.kernel.util.StringPool;
+import org.osgi.service.component.annotations.Component;
 
-public class CustomJWTAuthVerifier extends BaseAutoLogin implements AuthVerifier{
-
+@Component(
+	property = "auth.verifier.CustomJWTAuthVerifier.urls.includes=/api/jsonws/*",
+	service = AuthVerifier.class
+)
+public class CustomJWTAuthVerifier implements AutoLogin, AuthVerifier{
 	
 	private static final String BEARER = "Bearer";
-
+	
+	
 	@Override
 	public String getAuthType() {
-		return HttpServletRequest.BASIC_AUTH;
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	@Override
 	public AuthVerifierResult verify(AccessControlContext accessControlContext, Properties properties)
-		throws AuthException {
-
+			throws AuthException {
+		// TODO Auto-generated method stub
 		try {
 			AuthVerifierResult authVerifierResult = new AuthVerifierResult();
 
@@ -60,6 +53,7 @@ public class CustomJWTAuthVerifier extends BaseAutoLogin implements AuthVerifier
 				authVerifierResult.setPassword(credentials[1]);
 				authVerifierResult.setState(AuthVerifierResult.State.SUCCESS);
 				authVerifierResult.setUserId(Long.valueOf(credentials[0]));
+				authVerifierResult.setPasswordBasedAuthentication(Boolean.TRUE);
 			}
 			return authVerifierResult;
 		}
@@ -67,11 +61,19 @@ public class CustomJWTAuthVerifier extends BaseAutoLogin implements AuthVerifier
 			throw new AuthException(ale);
 		}
 	}
+	
+	
+	@Override
+	public String[] handleException(HttpServletRequest request, HttpServletResponse response, Exception e)
+			throws AutoLoginException {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 	@Override
-	protected String[] doLogin(HttpServletRequest request, HttpServletResponse response)throws Exception {
-
-		// Get the Authorization header, if one was supplied
+	public String[] login(HttpServletRequest request, HttpServletResponse response) throws AutoLoginException {
+		// TODO Auto-generated method stub
+		
 		String authorization = request.getHeader("Authorization");
 		if (authorization == null) {
 			return null;
@@ -84,7 +86,7 @@ public class CustomJWTAuthVerifier extends BaseAutoLogin implements AuthVerifier
 		if (!StringUtil.equalsIgnoreCase(basic, BEARER)) {
 			return null;
 		}
-
+		
 		String token = st.nextToken();
 		String[] credentials = null;
 		String[] tokenData = new TokenGenerator().decodeJWToken(token);
@@ -118,6 +120,8 @@ public class CustomJWTAuthVerifier extends BaseAutoLogin implements AuthVerifier
 		}
 		return credentials;
 	}
+	
+	
 	
 	private static Log _log = LogFactoryUtil.getLog(
 		CustomJWTAuthVerifier.class);
