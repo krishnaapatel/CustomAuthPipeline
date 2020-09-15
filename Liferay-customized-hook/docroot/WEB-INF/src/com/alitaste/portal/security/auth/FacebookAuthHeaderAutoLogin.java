@@ -100,7 +100,7 @@ public class FacebookAuthHeaderAutoLogin extends BaseAutoLogin implements AuthVe
 						int authResult = UserLocalServiceUtil.authenticateByEmailAddress(company.getCompanyId(), tokenData[1], tokenData[2], null,null,null);
 						if (authResult == Authenticator.SUCCESS) {
 							credentials[0] = String.valueOf(user.getUserId());
-							credentials[1] = tokenData[1];
+							credentials[1] = tokenData[2];
 							credentials[2] = Boolean.TRUE.toString();
 						}
 					}
