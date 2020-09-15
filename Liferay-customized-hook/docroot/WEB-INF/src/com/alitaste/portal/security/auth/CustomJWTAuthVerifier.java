@@ -37,7 +37,7 @@ import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.facebook.FacebookConnectUtil;
 import com.liferay.portal.kernel.util.StringPool;
 
-public class FacebookAuthHeaderAutoLogin extends BaseAutoLogin implements AuthVerifier{
+public class CustomJWTAuthVerifier extends BaseAutoLogin implements AuthVerifier{
 
 	
 	private static final String BEARER = "Bearer";
@@ -120,5 +120,5 @@ public class FacebookAuthHeaderAutoLogin extends BaseAutoLogin implements AuthVe
 	}
 	
 	private static Log _log = LogFactoryUtil.getLog(
-		FacebookAuthHeaderAutoLogin.class);
+		CustomJWTAuthVerifier.class);
 }
